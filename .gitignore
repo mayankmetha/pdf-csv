@@ -112,3 +112,7 @@ venv.bak/
 
 # outputs
 *.txt
+tmp/
+images/
+*.csv
+*.pdf

@@ -20,3 +20,5 @@ then
     #pip3 specific package installation
     pip3 install PyPDF2 pillow pdf2image pyocr pikepdf
 fi
+
+mkdir tmp images tmp/jpg tmp/ppm tmp/txt1 tmp/txt2

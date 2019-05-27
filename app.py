@@ -59,9 +59,50 @@ def imgOCR(imageFile):
     )
     return (txt.strip())
 
-f = 'ch1.pdf'
+# extract images from pdf
+def extractImage(f):
+    pdfFile = PyPDF2.PdfFileReader(open(f, "rb"))
+    pages = PyPDF2.PdfFileReader(pdfFile)
+    for p in range(pages):
+        page0 = pdfFile.getPage(p)
+
+        if '/XObject' in page0['/Resources']:
+            xObject = page0['/Resources']['/XObject'].getObject()
+
+            for obj in xObject:
+                if xObject[obj]['/Subtype'] == '/Image':
+                    size = (xObject[obj]['/Width'], xObject[obj]['/Height'])
+                    data = xObject[obj].getData()
+                    if xObject[obj]['/ColorSpace'] == '/DeviceRGB':
+                        mode = "RGB"
+                    else:
+                        mode = "P"
+                    
+                    if '/Filter' in xObject[obj]:
+                        if xObject[obj]['/Filter'] == '/FlateDecode':
+                            img = Image.frombytes(mode, size, data)
+                            img.save("images/"+obj[1:] + ".png")
+                        elif xObject[obj]['/Filter'] == '/DCTDecode':
+                            img = open("images/"+obj[1:] + ".jpg", "wb")
+                            img.write(data)
+                            img.close()
+                        elif xObject[obj]['/Filter'] == '/JPXDecode':
+                            img = open("images/"+obj[1:] + ".jp2", "wb")
+                            img.write(data)
+                            img.close()
+                        elif xObject[obj]['/Filter'] == '/CCITTFaxDecode':
+                            img = open("images/"+obj[1:] + ".tiff", "wb")
+                            img.write(data)
+                            img.close()
+                    else:
+                        img = Image.frombytes(mode, size, data)
+                        img.save("images/"+obj[1:] + ".png")
+        else:
+            print("No image found.")
+
+f = sys.argv[1]
 PDFOCR(f)
-fileOut = "csv"
+fileOut = "text.csv"
 # convert txt to csv
 pg = 0
 for i in images:
@@ -102,3 +143,4 @@ for _ in texts2:
     fin.close()
     i += 1
 fout.close()
+extractImage(f)
