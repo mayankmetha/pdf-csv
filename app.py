@@ -135,4 +135,4 @@ for _ in texts2:
     fin.close()
     i += 1
 fout.close()
-#extractImage(f)
+#extractImage(f) - PyPDF2 is broken needs fix
