@@ -1,5 +1,4 @@
 import PyPDF2
-from tkinter.filedialog import askopenfilename
 from pdf2image import convert_from_path
 import os
 import re
@@ -11,10 +10,6 @@ import pyocr.builders
 images = []
 texts1 = []
 texts2 = []
-
-# select File Dialog
-def openFileDialog():
-    return askopenfilename()
 
 # plain text pdf text extraction
 def simplePDFTextExtract(filename,fout):
@@ -65,10 +60,8 @@ def extractImage(f):
     pages = PyPDF2.PdfFileReader(pdfFile)
     for p in range(pages):
         page0 = pdfFile.getPage(p)
-
         if '/XObject' in page0['/Resources']:
             xObject = page0['/Resources']['/XObject'].getObject()
-
             for obj in xObject:
                 if xObject[obj]['/Subtype'] == '/Image':
                     size = (xObject[obj]['/Width'], xObject[obj]['/Height'])
@@ -77,7 +70,6 @@ def extractImage(f):
                         mode = "RGB"
                     else:
                         mode = "P"
-                    
                     if '/Filter' in xObject[obj]:
                         if xObject[obj]['/Filter'] == '/FlateDecode':
                             img = Image.frombytes(mode, size, data)
@@ -102,7 +94,7 @@ def extractImage(f):
 
 f = sys.argv[1]
 PDFOCR(f)
-fileOut = "text.csv"
+fileOut = sys.argv[2]
 # convert txt to csv
 pg = 0
 for i in images:
@@ -131,7 +123,7 @@ for i in texts1:
     fout.write("\n")
     fout.close() 
 
-fout = open('csv','w')
+fout = open(fileOut,'w')
 fout.write("page,line,content\n")
 i = 1
 for _ in texts2:
@@ -143,4 +135,4 @@ for _ in texts2:
     fin.close()
     i += 1
 fout.close()
-extractImage(f)
+#extractImage(f)
